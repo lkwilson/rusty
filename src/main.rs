@@ -2,17 +2,23 @@ mod sub_mod;
 
 fn run() -> u8 {
   let args: Vec<String> = std::env::args().collect();
+  let selected;
   if args.len() != 2 {
-    println!("Usage: {} <sub_module>", args[0]);
-    return 1;
+    selected = "";
+  } else {
+    selected = args[1].as_str();
   }
   // TODO: Fix redundancy
   let available_modules = ["sub_mod"];
-  match args[1].as_str() {
+  match selected {
     "sub_mod" => sub_mod::main(),
     _ => {
-      println!("Unknown module: {}", args[1]);
-      println!("Available modules: {:?}", available_modules);
+      println!("Usage: {} <sub_module>", args[0]);
+      if selected.len() != 0 {
+        println!("Unknown module: {}", selected);
+      } else {
+        println!("Available modules: {:?}", available_modules);
+      }
       1
     }
   }
