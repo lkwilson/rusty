@@ -1,3 +1,5 @@
+mod sub_mod;
+
 fn main() {
-    println!("Hello, world!");
+  sub_mod::main_fn();
 }
