@@ -6,10 +6,13 @@ fn run() -> u8 {
     println!("Usage: {} <sub_module>", args[0]);
     return 1;
   }
+  // TODO: Fix redundancy
+  let available_modules = ["sub_mod"];
   match args[1].as_str() {
     "sub_mod" => sub_mod::main(),
     _ => {
       println!("Unknown module: {}", args[1]);
+      println!("Available modules: {:?}", available_modules);
       1
     }
   }
