@@ -1,5 +1,8 @@
 mod sub_mod;
 
 fn main() {
-  sub_mod::main_fn();
+  let exit_code = sub_mod::main();
+
+  println!("Module exited with code {}", exit_code);
+  std::process::exit(exit_code.into());
 }
