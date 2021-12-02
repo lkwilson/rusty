@@ -1,4 +1,5 @@
 mod sub_mod;
+mod sub_mod_file;
 
 fn run() -> u8 {
   let args: Vec<String> = std::env::args().collect();
@@ -10,9 +11,11 @@ fn run() -> u8 {
   }
   // TODO: Fix redundancy
   let available_modules = [
+    "sub_mod_file",
     "sub_mod",
   ];
   match selected {
+    "sub_mod_file" => sub_mod_file::main(),
     "sub_mod" => sub_mod::main(),
     "" | _=> {
       println!("Usage: {} <sub_module>", args[0]);
