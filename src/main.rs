@@ -9,10 +9,12 @@ fn run() -> u8 {
     selected = args[1].as_str();
   }
   // TODO: Fix redundancy
-  let available_modules = ["sub_mod"];
+  let available_modules = [
+    "sub_mod",
+  ];
   match selected {
     "sub_mod" => sub_mod::main(),
-    _ => {
+    "" | _=> {
       println!("Usage: {} <sub_module>", args[0]);
       if selected.len() != 0 {
         println!("Unknown module: {}", selected);
