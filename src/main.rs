@@ -1,3 +1,4 @@
+mod heaps;
 mod sub_mod;
 mod sub_mod_file;
 
@@ -13,10 +14,12 @@ fn run() -> u8 {
   let available_modules = [
     "sub_mod_file",
     "sub_mod",
+    "heaps",
   ];
   match selected {
     "sub_mod_file" => sub_mod_file::main(),
     "sub_mod" => sub_mod::main(),
+    "heaps" => heaps::main(),
     "" | _=> {
       println!("Usage: {} <sub_module>", args[0]);
       if selected.len() != 0 {

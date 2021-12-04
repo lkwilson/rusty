@@ -69,3 +69,6 @@ trees, even non full ones.
 
 a complete k-ary tree is one wherver (1) all leaves have the same depth, and (2)
 all internal nodes have the same degree.
+
+
+q: for undirected and directed graphs, distinguish between edge, vertex, path, length of path, cycle, simple, connected, strongly connected
