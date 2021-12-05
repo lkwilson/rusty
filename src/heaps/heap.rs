@@ -4,25 +4,18 @@ These free functions are for heap management
 note: index is 0 based
 */
 
-/*
 pub fn get_parent_index(node_index: usize) -> usize {
-  let parent_index = (node_index + 1) / 2 - 1;
-  parent_index
+  (node_index + 1) / 2 - 1
 }
-*/
 
 pub fn get_left_child_index(node_index: usize) -> usize {
-  let left_child_index = (node_index + 1) * 2 - 1;
-  left_child_index
-}
-
-pub fn get_right_child_index(node_index: usize) -> usize {
-  let right_child_index = (node_index + 1) * 2;
-  right_child_index
+  (node_index + 1) * 2 - 1
 }
 
 /**
  * Vec must be non empty, and index must be in range. Otherwise, undefined behavior.
+ *
+ * compare(parent, child) must return true, if it meets the heap property.
  */
 fn heapify_from<T, F, const HEAPIFY_CHILDREN: bool>(vec: &mut Vec<T>, compare: &F, node_index: usize)
 where F: Fn(&T, &T)->bool, T: std::fmt::Debug {
@@ -40,17 +33,17 @@ where F: Fn(&T, &T)->bool, T: std::fmt::Debug {
 
   let mut swap_index = None;
   let nv = &vec[node_index];
-  if ri < size {
+  if ri < size { // both children
     let lv = &vec[li];
     let rv = &vec[ri];
-    if compare(rv, lv) { // rv >= lv
-      if compare(rv, nv) { // lv <= rv >= nv
+    if compare(rv, lv) { // rv higher
+      if !compare(nv, rv) { // not heap
         swap_index = Some(ri);
-      } // lv <= rv < nv
-    } else if compare(lv, nv) { // rv < lv >= nv
+      }
+    } else if !compare(nv, lv) { // lv higher and not heap
       swap_index = Some(li);
     }
-  } else if li < size && compare(&vec[li], nv) {
+  } else if li < size && !compare(nv, &vec[li]) { // only left child, not heap
     swap_index = Some(li);
   }
   match swap_index {
@@ -69,22 +62,18 @@ where F:Fn(&T, &T)->bool, T:std::fmt::Debug {
   }
 }
 
-fn is_heap_from<F:Fn(&T, &T)->bool, T>(vec: &Vec<T>, compare: &F, node_index: usize) -> bool {
-  let vec_length = vec.len();
-  let node_value = &vec[node_index];
-  let left_child_index = get_left_child_index(node_index);
-  let right_child_index = get_right_child_index(node_index);
-  let has_left_child = left_child_index < vec_length;
-  let has_right_child = right_child_index < vec_length;
-
-  (!has_left_child || compare(node_value, &vec[left_child_index])) &&
-  (!has_right_child || compare(node_value, &vec[right_child_index])) &&
-  (!has_left_child || is_heap_from(vec, compare, left_child_index)) &&
-  (!has_right_child || is_heap_from(vec, compare, right_child_index))
-}
-
-pub fn is_heap<F:Fn(&T, &T)->bool, T>(vec: &Vec<T>, compare: &F) -> bool {
-  vec.is_empty() || is_heap_from(vec, compare, 0)
+pub fn is_heap<F, T>(vec: &Vec<T>, compare: &F) -> bool
+where F: Fn(&T, &T)->bool, T: std::fmt::Debug {
+  for (index, node) in vec.iter().enumerate() {
+    if index == 0 {
+      continue;
+    }
+    let parent_index = get_parent_index(index);
+    if !compare(&vec[parent_index], node) {
+      return false;
+    }
+  }
+  true
 }
 
 pub fn main() -> u8 {
