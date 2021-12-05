@@ -12,15 +12,13 @@ fn get_left_child_index(node_index: usize) -> usize {
   (node_index + 1) * 2 - 1
 }
 
-/**
- * This will heapify a vector from index node_index with heap property tester,
- * compare. compare(parent_value, child_value) will return true if the heap
- * property for those nodes is satisfied. note that this means compare(value,
- * value) is always true. This function assumes child nodes are heaps, but the
- * node at node_index may not be. size is usually vec.len(), but doesn't have to
- * be if you want to use the back elements, for say heap sort.
- */
-fn heapify_from<T, F>(vec: &mut Vec<T>, compare: &F, node_index: usize, size: usize) where
+/// This will heapify a vector from index node_index with heap property tester,
+/// compare. compare(parent_value, child_value) will return true if the heap
+/// property for those nodes is satisfied. note that this means compare(value,
+/// value) is always true. This function assumes child nodes are heaps, but the
+/// node at node_index may not be. size is usually vec.len(), but doesn't have
+/// to be if you want to use the back elements, for say heap sort.
+pub fn heapify_from<T, F>(vec: &mut Vec<T>, compare: &F, node_index: usize, size: usize) where
     F: Fn(&T, &T)->bool {
   let li = get_left_child_index(node_index);
   let ri = li + 1;
@@ -60,19 +58,12 @@ where F:Fn(&T, &T)->bool {
   }
 }
 
-pub fn heap_sort<F, T>(vec: &mut Vec<T>, compare: &F) where
-    F: Fn(&T, &T)->bool {
-  heapify(vec, compare, vec.len());
-  let size = vec.len();
-  for index in (1..size).rev() {
-    vec.swap(0, index);
-    heapify_from(vec, compare, 0, index);
-  }
-}
-
 #[cfg(test)]
 mod tests {
   use super::*;
+  pub fn build_vector() -> Vec<i32> {
+    vec![0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5]
+  }
 
   fn is_heap<F, T>(vec: &Vec<T>, compare: &F) -> bool
   where F: Fn(&T, &T)->bool {
@@ -86,22 +77,6 @@ mod tests {
       }
     }
     true
-  }
-
-  fn is_sorted<T, F>(vec: &Vec<T>, compare: &F) -> bool
-  where F: Fn(&T, &T)->bool {
-    for index in 1..vec.len() {
-      let prev_value = &vec[index-1];
-      let curr_value = &vec[index];
-      if !compare(prev_value, curr_value) {
-        return false;
-      }
-    }
-    true
-  }
-
-  fn build_heap() -> Vec<i32> {
-    vec![0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5]
   }
 
   #[test]
@@ -125,7 +100,7 @@ mod tests {
 
   #[test]
   fn max_heap() {
-    let mut heap = build_heap();
+    let mut heap = build_vector();
     let size = heap.len();
 
     heapify(&mut heap, &std::cmp::PartialOrd::ge, size);
@@ -135,27 +110,11 @@ mod tests {
 
   #[test]
   fn min_mean() {
-    let mut heap = build_heap();
+    let mut heap = build_vector();
     let size = heap.len();
 
     heapify(&mut heap, &std::cmp::PartialOrd::le, size);
     assert!(is_heap(&heap, &std::cmp::PartialOrd::le));
     assert!(!is_heap(&heap, &std::cmp::PartialOrd::ge));
-  }
-
-  #[test]
-  fn max_heap_sort() {
-    let mut heap = build_heap();
-
-    heap_sort(&mut heap, &std::cmp::PartialOrd::ge);
-    assert!(is_sorted(&mut heap, &std::cmp::PartialOrd::le));
-  }
-
-  #[test]
-  fn min_heap_sort() {
-    let mut heap = build_heap();
-
-    heap_sort(&mut heap, &std::cmp::PartialOrd::le);
-    assert!(is_sorted(&mut heap, &std::cmp::PartialOrd::ge));
   }
 }
