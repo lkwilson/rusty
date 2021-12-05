@@ -1,4 +1,7 @@
-pub fn main() -> u8 {
-  println!("I'm a submodule, but a file");
-  2
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn run() {
+    println!("I'm a submodule, but a file");
+  }
 }

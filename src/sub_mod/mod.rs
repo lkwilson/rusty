@@ -1,5 +1,7 @@
-pub fn main() -> u8 {
-  println!("Hello from a sub mod dir!");
-
-  255
+#[cfg(test)]
+mod tests {
+  #[test]
+  fn sub_mod() {
+    println!("Hello from a sub mod dir!");
+  }
 }

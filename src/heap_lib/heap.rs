@@ -70,54 +70,73 @@ pub fn heap_sort<F, T>(vec: &mut Vec<T>, compare: &F) where
   }
 }
 
-fn is_heap<F, T>(vec: &Vec<T>, compare: &F) -> bool
-where F: Fn(&T, &T)->bool {
-  for (index, node) in vec.iter().enumerate() {
-    if index == 0 {
-      continue;
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  fn is_heap<F, T>(vec: &Vec<T>, compare: &F) -> bool
+  where F: Fn(&T, &T)->bool {
+    for (index, node) in vec.iter().enumerate() {
+      if index == 0 {
+        continue;
+      }
+      let parent_index = get_parent_index(index);
+      if !compare(&vec[parent_index], node) {
+        return false;
+      }
     }
-    let parent_index = get_parent_index(index);
-    if !compare(&vec[parent_index], node) {
-      return false;
-    }
+    true
   }
-  true
-}
 
-fn is_sorted<T, F>(vec: &Vec<T>, compare: &F) -> bool
-where F: Fn(&T, &T)->bool {
-  for index in 1..vec.len() {
-    let prev_value = &vec[index-1];
-    let curr_value = &vec[index];
-    if !compare(prev_value, curr_value) {
-      return false;
+  fn is_sorted<T, F>(vec: &Vec<T>, compare: &F) -> bool
+  where F: Fn(&T, &T)->bool {
+    for index in 1..vec.len() {
+      let prev_value = &vec[index-1];
+      let curr_value = &vec[index];
+      if !compare(prev_value, curr_value) {
+        return false;
+      }
     }
+    true
   }
-  true
-}
 
-pub fn main() -> u8 {
-  let mut heap = vec![0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5];
-  let size = heap.len();
-  println!("Pre heapify: {:?}", heap);
+  fn build_heap() -> Vec<i32> {
+    vec![0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5]
+  }
 
-  heapify(&mut heap, &std::cmp::PartialOrd::ge, size);
-  println!("Post max heapify: {:?}", heap);
-  assert!(is_heap(&heap, &std::cmp::PartialOrd::ge));
-  assert!(!is_heap(&heap, &std::cmp::PartialOrd::le));
+  #[test]
+  fn max_heap() {
+    let mut heap = build_heap();
+    let size = heap.len();
 
-  heapify(&mut heap, &std::cmp::PartialOrd::le, size);
-  println!("Post min heapify: {:?}", heap);
-  assert!(is_heap(&heap, &std::cmp::PartialOrd::le));
-  assert!(!is_heap(&heap, &std::cmp::PartialOrd::ge));
+    heapify(&mut heap, &std::cmp::PartialOrd::ge, size);
+    assert!(is_heap(&heap, &std::cmp::PartialOrd::ge));
+    assert!(!is_heap(&heap, &std::cmp::PartialOrd::le));
+  }
 
-  heap_sort(&mut heap, &std::cmp::PartialOrd::ge);
-  println!("Post max heap sort: {:?}", heap);
-  assert!(is_sorted(&mut heap, &std::cmp::PartialOrd::le));
+  #[test]
+  fn min_mean() {
+    let mut heap = build_heap();
+    let size = heap.len();
 
-  heap_sort(&mut heap, &std::cmp::PartialOrd::le);
-  println!("Post min heap sort: {:?}", heap);
-  assert!(is_sorted(&mut heap, &std::cmp::PartialOrd::ge));
+    heapify(&mut heap, &std::cmp::PartialOrd::le, size);
+    assert!(is_heap(&heap, &std::cmp::PartialOrd::le));
+    assert!(!is_heap(&heap, &std::cmp::PartialOrd::ge));
+  }
 
-  0
+  #[test]
+  fn max_heap_sort() {
+    let mut heap = build_heap();
+
+    heap_sort(&mut heap, &std::cmp::PartialOrd::ge);
+    assert!(is_sorted(&mut heap, &std::cmp::PartialOrd::le));
+  }
+
+  #[test]
+  fn min_heap_sort() {
+    let mut heap = build_heap();
+
+    heap_sort(&mut heap, &std::cmp::PartialOrd::le);
+    assert!(is_sorted(&mut heap, &std::cmp::PartialOrd::ge));
+  }
 }
