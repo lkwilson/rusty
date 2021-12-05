@@ -22,17 +22,17 @@ pub fn get_right_child_index(node_index: usize) -> usize {
 /**
  * Vec must be non empty, and index must be in range. Otherwise, undefined behavior.
  */
-fn heapify_from<T, F, const heapify_children: bool>(vec: &mut Vec<T>, compare: &F, node_index: usize)
+fn heapify_from<T, F>(vec: &mut Vec<T>, compare: &F, node_index: usize, heapify_children: bool)
 where F:Fn(&T, &T)->bool, T:std::fmt::Debug {
   let li = get_left_child_index(node_index);
   let ri = li + 1;
   let size = vec.len();
   if heapify_children {
     if ri < size {
-      heapify_from(vec, compare, li, heapify_children);
-      heapify_from(vec, compare, ri, heapify_children);
+      heapify_from(vec, compare, li, true);
+      heapify_from(vec, compare, ri, true);
     } else if li < size {
-      heapify_from(vec, compare, li, heapify_children);
+      heapify_from(vec, compare, li, true);
     }
   }
 
@@ -43,13 +43,13 @@ where F:Fn(&T, &T)->bool, T:std::fmt::Debug {
     let rv = &vec[ri];
     if compare(rv, lv) { // rv >= lv
       if compare(rv, nv) { // lv <= rv >= nv
-        swap_index = ri;
+        swap_index = Some(ri);
       } // lv <= rv < nv
     } else if compare(lv, nv) { // rv < lv >= nv
-      swap_index = li;
+      swap_index = Some(li);
     }
   } else if li < size && compare(&vec[li], nv) {
-    swap_index = li;
+    swap_index = Some(li);
   }
   match swap_index {
     Some(swap_index) => {
