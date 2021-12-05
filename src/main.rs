@@ -1,39 +1,10 @@
 mod heaps;
-mod sub_mod;
-mod sub_mod_file;
-
-fn run() -> u8 {
-  let args: Vec<String> = std::env::args().collect();
-  let selected;
-  if args.len() != 2 {
-    selected = "";
-  } else {
-    selected = args[1].as_str();
-  }
-  // TODO: Fix redundancy
-  let available_modules = [
-    "sub_mod_file",
-    "sub_mod",
-    "heaps",
-  ];
-  match selected {
-    "sub_mod_file" => sub_mod_file::main(),
-    "sub_mod" => sub_mod::main(),
-    "heaps" => heaps::main(),
-    "" | _=> {
-      println!("Usage: {} <sub_module>", args[0]);
-      if selected.len() != 0 {
-        println!("Unknown module: {}", selected);
-      } else {
-        println!("Available modules: {:?}", available_modules);
-      }
-      1
-    }
-  }
-}
+// mod sub_mod;
+// mod sub_mod_file;
+// mod play;
 
 fn main() {
-  let exit_code = run();
+  let exit_code = heaps::heap::main();
   println!("Module exited with code {}", exit_code);
   std::process::exit(exit_code.into());
 }
