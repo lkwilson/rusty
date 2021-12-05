@@ -4,16 +4,24 @@ These free functions are for heap management
 note: index is 0 based
 */
 
-pub fn get_parent_index(index: usize) -> usize {
-  (index + 1) / 2
+pub fn get_parent_index(node_index: usize) -> usize {
+  let parent_index = (node_index + 1) / 2 - 1;
+  // println!("Getting parent index: {} -> {}", node_index, parent_index);
+  parent_index
 }
 
 pub fn get_left_child_index(node_index: usize) -> usize {
-  (node_index + 1) * 2 - 1
+  let left_child_index = (node_index + 1) * 2 - 1;
+  // println!("Getting left child index: {} -> {}", node_index, left_child_index);
+  // assert_eq!(node_index, get_parent_index(left_child_index));
+  left_child_index
 }
 
 pub fn get_right_child_index(node_index: usize) -> usize {
-  get_left_child_index(node_index) + 1
+  let right_child_index = (node_index + 1) * 2;
+  // println!("Getting right child index: {} -> {}", node_index, right_child_index);
+  // assert_eq!(node_index, get_parent_index(right_child_index));
+  right_child_index
 }
 
 /**
