@@ -21,6 +21,8 @@ pub fn get_right_child_index(node_index: usize) -> usize {
 
 /**
  * Vec must be non empty, and index must be in range. Otherwise, undefined behavior.
+ *
+ * TODO: find how to make heapify_children known at compile time
  */
 fn heapify_from<T, F>(vec: &mut Vec<T>, compare: &F, node_index: usize, heapify_children: bool)
 where F:Fn(&T, &T)->bool, T:std::fmt::Debug {
