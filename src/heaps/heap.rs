@@ -4,10 +4,12 @@ These free functions are for heap management
 note: index is 0 based
 */
 
+/*
 pub fn get_parent_index(node_index: usize) -> usize {
   let parent_index = (node_index + 1) / 2 - 1;
   parent_index
 }
+*/
 
 pub fn get_left_child_index(node_index: usize) -> usize {
   let left_child_index = (node_index + 1) * 2 - 1;
@@ -19,76 +21,51 @@ pub fn get_right_child_index(node_index: usize) -> usize {
   right_child_index
 }
 
-heapify_heap_after_replace_root
-
 /**
  * Vec must be non empty, and index must be in range. Otherwise, undefined behavior.
  */
-fn heapify_from<F:Fn(&T, &T)->bool, T:std::fmt::Debug>(vec: &mut Vec<T>, compare: &F, node_index: usize) {
-  let left_child_index = get_left_child_index(node_index);
-  if left_child_index < vec.len() {
-    heapify_from(vec, compare, left_child_index);
+fn heapify_from<T, F, const HEAPIFY_CHILDREN: bool>(vec: &mut Vec<T>, compare: &F, node_index: usize)
+where F: Fn(&T, &T)->bool, T: std::fmt::Debug {
+  let li = get_left_child_index(node_index);
+  let ri = li + 1;
+  let size = vec.len();
+  if HEAPIFY_CHILDREN {
+    if ri < size {
+      heapify_from::<_, _, true>(vec, compare, li);
+      heapify_from::<_, _, true>(vec, compare, ri);
+    } else if li < size {
+      heapify_from::<_, _, true>(vec, compare, li);
+    }
   }
 
-  let right_child_index = get_right_child_index(node_index);
-  if right_child_index < vec.len() {
-    heapify_from(vec, compare, right_child_index);
-  }
-
-  let swap_index: Option<usize>;
-  let node_value = &vec[node_index];
-  if left_child_index < vec.len() && right_child_index < vec.len() {
-    // has both children
-    let left_child_value = &vec[left_child_index];
-    let right_child_value = &vec[right_child_index];
-    if compare(left_child_value, node_value) {
-      // left is higher than root
-      if compare(left_child_value, right_child_value) {
-        // left is higher than right
-        // thus left is the highest
-        swap_index = Some(left_child_index);
-      } else {
-        // right is higher than left
-        // thus right is the highest
-        swap_index = Some(right_child_index);
-      }
-    } else if compare(right_child_value, node_value) {
-      // left is not higher than root
-      // right is higher than root
-      // thus right is the highest
-      swap_index = Some(right_child_index);
-    } else {
-      swap_index = None;
+  let mut swap_index = None;
+  let nv = &vec[node_index];
+  if ri < size {
+    let lv = &vec[li];
+    let rv = &vec[ri];
+    if compare(rv, lv) { // rv >= lv
+      if compare(rv, nv) { // lv <= rv >= nv
+        swap_index = Some(ri);
+      } // lv <= rv < nv
+    } else if compare(lv, nv) { // rv < lv >= nv
+      swap_index = Some(li);
     }
-  } else if left_child_index < vec.len() {
-    // only left child compare
-    if compare(&vec[left_child_index], node_value) {
-      swap_index = Some(left_child_index);
-    } else {
-      swap_index = None;
-    }
-  } else if right_child_index < vec.len() {
-    // only rigth child compare
-    if compare(&vec[right_child_index], node_value) {
-      swap_index = Some(right_child_index);
-    } else {
-      swap_index = None;
-    }
-  } else {
-    swap_index = None;
+  } else if li < size && compare(&vec[li], nv) {
+    swap_index = Some(li);
   }
   match swap_index {
     Some(swap_index) => {
-      vec.swap(node_index, swap_index);
-      heapify_heap_after_replace_root(vec, compare, swap_index);
+      vec.swap(swap_index, node_index);
+      heapify_from::<_, _, false>(vec, compare, swap_index);
     },
     None => {}
   }
 }
 
-pub fn heapify<F:Fn(&T, &T)->bool, T:std::fmt::Debug>(vec: &mut Vec<T>, compare: &F) {
+fn heapify<F, T>(vec: &mut Vec<T>, compare: &F)
+where F:Fn(&T, &T)->bool, T:std::fmt::Debug {
   if !vec.is_empty() {
-    heapify_from(vec, &compare, 0);
+    heapify_from::<_, _, true>(vec, compare, 0);
   }
 }
 
@@ -111,7 +88,7 @@ pub fn is_heap<F:Fn(&T, &T)->bool, T>(vec: &Vec<T>, compare: &F) -> bool {
 }
 
 pub fn main() -> u8 {
-  let mut heap = vec![0, 1, 2, 3, 4, 5];
+  let mut heap = vec![0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5];
   println!("Pre heapify: {:?}", heap);
 
   heapify(&mut heap, &std::cmp::PartialOrd::ge);
