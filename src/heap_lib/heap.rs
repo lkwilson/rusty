@@ -105,6 +105,25 @@ mod tests {
   }
 
   #[test]
+  fn parent_child_index_relative() {
+    for i in 1..1000 {
+      let li = get_left_child_index(i);
+      let ri = li + 1;
+      assert_eq!(i, get_parent_index(li));
+      assert_eq!(i, get_parent_index(ri));
+    }
+  }
+
+  #[test]
+  fn child_index_hard_coded_values() {
+    assert_eq!(get_left_child_index(7), 15);
+    assert_eq!(get_left_child_index(0), 1);
+    assert_eq!(get_left_child_index(1), 3);
+    assert_eq!(get_left_child_index(2), 5);
+    assert_eq!(get_left_child_index(10), 21);
+  }
+
+  #[test]
   fn max_heap() {
     let mut heap = build_heap();
     let size = heap.len();
