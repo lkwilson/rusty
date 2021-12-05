@@ -4,11 +4,11 @@ These free functions are for heap management
 note: index is 0 based
 */
 
-pub fn get_parent_index(node_index: usize) -> usize {
+fn get_parent_index(node_index: usize) -> usize {
   (node_index + 1) / 2 - 1
 }
 
-pub fn get_left_child_index(node_index: usize) -> usize {
+fn get_left_child_index(node_index: usize) -> usize {
   (node_index + 1) * 2 - 1
 }
 
@@ -49,21 +49,7 @@ fn heapify_from<T, F>(vec: &mut Vec<T>, compare: &F, node_index: usize, size: us
   }
 }
 
-/**
- * Vec must be non empty, and index must be in range. Otherwise, undefined behavior.
- *
- * compare(parent, child) must return true, if it meets the heap property.
- *
- * This function was inefficient for lots of reasons:
- * - we use recursion to get to the deepest leaves
- * - we heapify the leaf nodes when we know exactly where the leaf nodes are
- * - when ensuring children are heaps, we start from the root when we can jump
- *   straight to the parent of the last leaf node
- */
-// fn heapify_from<T, F, const HEAPIFY_CHILDREN: bool>(vec: &mut Vec<T>, compare: &F, node_index: usize)
-// where F: Fn(&T, &T)->bool, T: std::fmt::Debug {...}
-
-fn heapify<F, T>(vec: &mut Vec<T>, compare: &F, size: usize)
+pub fn heapify<F, T>(vec: &mut Vec<T>, compare: &F, size: usize)
 where F:Fn(&T, &T)->bool {
   if size > 1 {
     let index = size - 1;
@@ -74,7 +60,7 @@ where F:Fn(&T, &T)->bool {
   }
 }
 
-fn heap_sort<F, T>(vec: &mut Vec<T>, compare: &F) where
+pub fn heap_sort<F, T>(vec: &mut Vec<T>, compare: &F) where
     F: Fn(&T, &T)->bool {
   heapify(vec, compare, vec.len());
   let size = vec.len();
@@ -84,7 +70,7 @@ fn heap_sort<F, T>(vec: &mut Vec<T>, compare: &F) where
   }
 }
 
-pub fn is_heap<F, T>(vec: &Vec<T>, compare: &F) -> bool
+fn is_heap<F, T>(vec: &Vec<T>, compare: &F) -> bool
 where F: Fn(&T, &T)->bool {
   for (index, node) in vec.iter().enumerate() {
     if index == 0 {
@@ -98,7 +84,7 @@ where F: Fn(&T, &T)->bool {
   true
 }
 
-pub fn is_sorted<T, F>(vec: &Vec<T>, compare: &F) -> bool
+fn is_sorted<T, F>(vec: &Vec<T>, compare: &F) -> bool
 where F: Fn(&T, &T)->bool {
   for index in 1..vec.len() {
     let prev_value = &vec[index-1];
