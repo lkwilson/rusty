@@ -27,53 +27,66 @@ pub fn get_right_child_index(node_index: usize) -> usize {
 /**
  * Vec must be non empty, and index must be in range. Otherwise, undefined behavior.
  */
-pub fn heapify_from<F:Fn(&T, &T)->bool, T>(vec: &mut Vec<T>, compare: &F, node_index: usize) {
+pub fn heapify_from<F:Fn(&T, &T)->bool, T:std::fmt::Debug>(vec: &mut Vec<T>, compare: &F, node_index: usize) {
+  println!("Heapifying {:?} from index {}", vec, node_index);
   let left_child_index = get_left_child_index(node_index);
   if left_child_index < vec.len() {
+    println!("Heapifying left child found at index {}", left_child_index);
     heapify_from(vec, compare, left_child_index);
   }
 
   let right_child_index = get_right_child_index(node_index);
   if right_child_index < vec.len() {
+    println!("Heapifying right child found at index {}", right_child_index);
     heapify_from(vec, compare, right_child_index);
   }
 
   let node_value = &vec[node_index];
   if left_child_index < vec.len() && right_child_index < vec.len() {
-    // compare with both children
+    // has both children
     let left_child_value = &vec[left_child_index];
     let right_child_value = &vec[right_child_index];
+    println!("Left and right child found: root:{:?} left:{:?} right:{:?}", node_value, left_child_value, right_child_value);
     if compare(left_child_value, node_value) {
-      // left is bigger than root
+      // left is higher than root
       if compare(left_child_value, right_child_value) {
-        // left is bigger than right
-        // thus left is the biggest
+        // left is higher than right
+        // thus left is the highest
+        println!("left child was highest");
         vec.swap(node_index, left_child_index);
       } else {
-        // right is bigger than left
-        // thus right is the biggest
+        // right is higher than left
+        // thus right is the highest
+        println!("right child was highest");
         vec.swap(node_index, right_child_index);
       }
     } else if compare(right_child_value, node_value) {
-      // left is not bigger than root
-      // right is bigger than root
-      // thus right is the largest
+      // left is not higher than root
+      // right is higher than root
+      // thus right is the highest
+      println!("right child was highest");
       vec.swap(node_index, right_child_index);
     }
+    println!("Post: root:{:?} left:{:?} right:{:?}", &vec[node_index], &vec[left_child_index], &vec[right_child_index]);
   } else if left_child_index < vec.len() {
     // only left child compare
     if compare(&vec[left_child_index], node_value) {
+      println!("only child, left child, was higher");
       vec.swap(node_index, left_child_index);
     }
+    println!("Post: root:{:?} left:{:?} right:-", &vec[node_index], &vec[left_child_index]);
   } else if right_child_index < vec.len() {
     // only rigth child compare
     if compare(&vec[right_child_index], node_value) {
+      println!("only child, right child, was higher");
       vec.swap(node_index, right_child_index);
     }
+    println!("Post: root:{:?} left:- right:{:?}", &vec[node_index], &vec[right_child_index]);
   }
+  println!("Done heapifying from index {}", node_index);
 }
 
-pub fn heapify<F:Fn(&T, &T)->bool, T>(vec: &mut Vec<T>, compare: &F) {
+pub fn heapify<F:Fn(&T, &T)->bool, T:std::fmt::Debug>(vec: &mut Vec<T>, compare: &F) {
   if !vec.is_empty() {
     heapify_from(vec, &compare, 0);
   }
@@ -98,7 +111,7 @@ pub fn is_heap<F:Fn(&T, &T)->bool, T>(vec: &Vec<T>, compare: &F) -> bool {
 }
 
 pub fn main() -> u8 {
-  let mut heap = vec![1, 2, 3, 4, 5];
+  let mut heap = vec![0, 1, 2, 3, 4, 5];
   println!("Pre heapify: {:?}", heap);
 
   heapify(&mut heap, &std::cmp::PartialOrd::ge);
