@@ -1,3 +1,8 @@
+
+
+
+
+
 // TODO: non hard coded type and capacity
 pub struct Heap<const CAPACITY:usize> {
   nodes: [i32; CAPACITY],
@@ -13,7 +18,7 @@ pub fn left_child(idx: usize) -> usize {
 }
 
 pub fn right_child(idx: usize) -> usize {
-  (idx + 1) * 2
+  left_child(idx) + 1
 }
 
 impl<const CAPACITY:usize> Heap<CAPACITY> {
