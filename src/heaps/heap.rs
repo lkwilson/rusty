@@ -4,10 +4,12 @@ These free functions are for heap management
 note: index is 0 based
 */
 
+/*
 pub fn get_parent_index(node_index: usize) -> usize {
   let parent_index = (node_index + 1) / 2 - 1;
   parent_index
 }
+*/
 
 pub fn get_left_child_index(node_index: usize) -> usize {
   let left_child_index = (node_index + 1) * 2 - 1;
@@ -21,20 +23,18 @@ pub fn get_right_child_index(node_index: usize) -> usize {
 
 /**
  * Vec must be non empty, and index must be in range. Otherwise, undefined behavior.
- *
- * TODO: find how to make heapify_children known at compile time
  */
-fn heapify_from<T, F>(vec: &mut Vec<T>, compare: &F, node_index: usize, heapify_children: bool)
-where F:Fn(&T, &T)->bool, T:std::fmt::Debug {
+fn heapify_from<T, F, const HEAPIFY_CHILDREN: bool>(vec: &mut Vec<T>, compare: &F, node_index: usize)
+where F: Fn(&T, &T)->bool, T: std::fmt::Debug {
   let li = get_left_child_index(node_index);
   let ri = li + 1;
   let size = vec.len();
-  if heapify_children {
+  if HEAPIFY_CHILDREN {
     if ri < size {
-      heapify_from(vec, compare, li, true);
-      heapify_from(vec, compare, ri, true);
+      heapify_from::<_, _, true>(vec, compare, li);
+      heapify_from::<_, _, true>(vec, compare, ri);
     } else if li < size {
-      heapify_from(vec, compare, li, true);
+      heapify_from::<_, _, true>(vec, compare, li);
     }
   }
 
@@ -56,7 +56,7 @@ where F:Fn(&T, &T)->bool, T:std::fmt::Debug {
   match swap_index {
     Some(swap_index) => {
       vec.swap(swap_index, node_index);
-      heapify_from(vec, compare, swap_index, false);
+      heapify_from::<_, _, false>(vec, compare, swap_index);
     },
     None => {}
   }
@@ -65,7 +65,7 @@ where F:Fn(&T, &T)->bool, T:std::fmt::Debug {
 fn heapify<F, T>(vec: &mut Vec<T>, compare: &F)
 where F:Fn(&T, &T)->bool, T:std::fmt::Debug {
   if !vec.is_empty() {
-    heapify_from(vec, &compare, 0, true);
+    heapify_from::<_, _, true>(vec, compare, 0);
   }
 }
 
@@ -88,7 +88,7 @@ pub fn is_heap<F:Fn(&T, &T)->bool, T>(vec: &Vec<T>, compare: &F) -> bool {
 }
 
 pub fn main() -> u8 {
-  let mut heap = vec![0, 1, 2, 3, 4, 5];
+  let mut heap = vec![0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5];
   println!("Pre heapify: {:?}", heap);
 
   heapify(&mut heap, &std::cmp::PartialOrd::ge);
