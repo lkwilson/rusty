@@ -1,6 +1,6 @@
 use crate::heap_lib::heap;
 
-pub fn heap_sort<F, T>(vec: &mut Vec<T>, compare: &F) where
+pub fn heapsort<F, T>(vec: &mut Vec<T>, compare: &F) where
     F: Fn(&T, &T)->bool {
   heap::heapify(vec, compare, vec.len());
   let size = vec.len();
@@ -30,18 +30,18 @@ mod tests {
   }
 
   #[test]
-  fn max_heap_sort() {
+  fn max_heapsort() {
     let mut heap = build_vector();
 
-    heap_sort(&mut heap, &std::cmp::PartialOrd::ge);
+    heapsort(&mut heap, &std::cmp::PartialOrd::ge);
     assert!(is_sorted(&mut heap, &std::cmp::PartialOrd::le));
   }
 
   #[test]
-  fn min_heap_sort() {
+  fn min_heapsort() {
     let mut heap = build_vector();
 
-    heap_sort(&mut heap, &std::cmp::PartialOrd::le);
+    heapsort(&mut heap, &std::cmp::PartialOrd::le);
     assert!(is_sorted(&mut heap, &std::cmp::PartialOrd::ge));
   }
 }
