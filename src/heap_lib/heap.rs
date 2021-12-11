@@ -47,6 +47,51 @@ pub(super) fn heapify_from<T, F>(vec: &mut Vec<T>, compare: &F, node_index: usiz
   }
 }
 
+/// Push a value into a heap
+pub fn insert_heap<F, T>(val: T, vec: &mut Vec<T>, compare: &F)
+where F:Fn(&T, &T)->bool {
+  let mut new_value_idx = vec.len();
+  vec.push(val);
+  while new_value_idx != 0 {
+    let parent_idx = get_parent_index(new_value_idx);
+    if !compare(&vec[parent_idx], &vec[new_value_idx]) {
+      vec.swap(parent_idx, new_value_idx);
+      new_value_idx = parent_idx;
+    } else {
+      return
+    }
+  }
+}
+
+/// Pop the root node out of a heap. Assumes size is non zero. 
+/// Swap the 
+pub fn extract_heap<F, T>(vec: &mut Vec<T>, compare: &F) -> T
+where F:Fn(&T, &T)->bool {
+  let size = vec.len();
+  let mut parent_idx = 0;
+
+  // TOOD: we keep swapping the root element, we can just assign log(n) times
+  // and return instead of swap log(n) times
+  loop {
+    let left_child_idx = get_left_child_index(parent_idx);
+    // TODO we know the height of the tree, no need to check for size at all
+    if left_child_idx + 1 < size {
+      if compare(&vec[left_child_idx], &vec[left_child_idx + 1]) {
+        vec.swap(parent_idx, left_child_idx);
+        parent_idx = left_child_idx;
+      } else {
+        let right_child_idx = left_child_idx + 1;
+        vec.swap(parent_idx, right_child_idx);
+        parent_idx = right_child_idx;
+      }
+    } else {
+      vec.swap(parent_idx, left_child_idx);
+      // only left child. swap pop and return
+    }
+  }
+}
+
+/// give me a vector, and I'll heapify it.
 pub fn heapify<F, T>(vec: &mut Vec<T>, compare: &F, size: usize)
 where F:Fn(&T, &T)->bool {
   if size > 1 {
@@ -65,6 +110,10 @@ mod tests {
     vec![0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5]
   }
 
+  pub fn build_vector_sorted() -> Vec<i32> {
+    vec![0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5]
+  }
+
   fn is_heap<F, T>(vec: &Vec<T>, compare: &F) -> bool
   where F: Fn(&T, &T)->bool {
     for (index, node) in vec.iter().enumerate() {
@@ -77,6 +126,28 @@ mod tests {
       }
     }
     true
+  }
+
+  #[test]
+  fn extract_and_insert_heap() {
+    let data = build_vector();
+    let mut heap = Vec::new();
+    let compare = &std::cmp::PartialOrd::ge;
+    for el in data {
+      let len = heap.len();
+      insert_heap(el, &mut heap, compare, len);
+    }
+    let mut output = Vec::new();
+    while !heap.is_empty() {
+      let len = heap.len();
+      let val = extract_heap(&mut heap, compare, len);
+      println!("Popped: {}", val);
+      output.push(val);
+    }
+    let sorted: Vec<i32> = build_vector_sorted();
+
+    assert_eq!(sorted.len(), output.len());
+    assert_eq!(sorted, output);
   }
 
   #[test]
