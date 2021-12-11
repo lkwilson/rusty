@@ -1,4 +1,4 @@
-use super::heap;
+use crate::heap_lib::heap;
 
 pub fn heap_sort<F, T>(vec: &mut Vec<T>, compare: &F) where
     F: Fn(&T, &T)->bool {

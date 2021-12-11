@@ -28,7 +28,7 @@ fn get_left_child_index(node_index: usize) -> usize {
 ///
 /// size is usually vec.len(), but doesn't have to be if you want to use the
 /// back elements, for say heap sort.
-pub(super) fn heapify_from<T, F>(vec: &mut Vec<T>, compare: &F, node_index: usize, size: usize) where
+pub fn heapify_from<T, F>(vec: &mut Vec<T>, compare: &F, node_index: usize, size: usize) where
     F: Fn(&T, &T)->bool {
   let li = get_left_child_index(node_index);
   let ri = li + 1;
