@@ -13,11 +13,21 @@ fn get_left_child_index(node_index: usize) -> usize {
 }
 
 /// This will heapify a vector from index node_index with heap property tester,
-/// compare. compare(parent_value, child_value) will return true if the heap
-/// property for those nodes is satisfied. note that this means compare(value,
-/// value) is always true. This function assumes child nodes are heaps, but the
-/// node at node_index may not be. size is usually vec.len(), but doesn't have
-/// to be if you want to use the back elements, for say heap sort.
+/// compare.
+///
+/// compare(parent_value, child_value) will return true if the heap property for
+/// those nodes is satisfied. note that this means compare(value, value) is
+/// always true.
+///
+/// node_index must be a valid index and less than size
+///
+/// size must be non zero and less than or equal to vec.len()
+///
+/// This function assumes child nodes are heaps, but the node at node_index may
+/// not be.
+///
+/// size is usually vec.len(), but doesn't have to be if you want to use the
+/// back elements, for say heap sort.
 pub(super) fn heapify_from<T, F>(vec: &mut Vec<T>, compare: &F, node_index: usize, size: usize) where
     F: Fn(&T, &T)->bool {
   let li = get_left_child_index(node_index);
@@ -38,12 +48,9 @@ pub(super) fn heapify_from<T, F>(vec: &mut Vec<T>, compare: &F, node_index: usiz
   } else if li < size && !compare(nv, &vec[li]) { // only left child, not heap
     swap_index = Some(li);
   }
-  match swap_index {
-    Some(swap_index) => {
-      vec.swap(swap_index, node_index);
-      heapify_from(vec, compare, swap_index, size);
-    },
-    None => {}
+  if let Some(swap_index) = swap_index {
+    vec.swap(swap_index, node_index);
+    heapify_from(vec, compare, swap_index, size);
   }
 }
 
@@ -63,31 +70,17 @@ where F:Fn(&T, &T)->bool {
   }
 }
 
-/// Pop the root node out of a heap. Assumes size is non zero. 
-/// Swap the 
+/// Pop the root node out of a heap. Assumes non empty
 pub fn extract_heap<F, T>(vec: &mut Vec<T>, compare: &F) -> T
 where F:Fn(&T, &T)->bool {
   let size = vec.len();
-  let mut parent_idx = 0;
-
-  // TOOD: we keep swapping the root element, we can just assign log(n) times
-  // and return instead of swap log(n) times
-  loop {
-    let left_child_idx = get_left_child_index(parent_idx);
-    // TODO we know the height of the tree, no need to check for size at all
-    if left_child_idx + 1 < size {
-      if compare(&vec[left_child_idx], &vec[left_child_idx + 1]) {
-        vec.swap(parent_idx, left_child_idx);
-        parent_idx = left_child_idx;
-      } else {
-        let right_child_idx = left_child_idx + 1;
-        vec.swap(parent_idx, right_child_idx);
-        parent_idx = right_child_idx;
-      }
-    } else {
-      vec.swap(parent_idx, left_child_idx);
-      // only left child. swap pop and return
-    }
+  match size {
+    1 => vec.pop().unwrap(),
+    _ => {
+      vec.swap(0, size-1);
+      heapify_from(vec, compare, 0, size-1);
+      vec.pop().unwrap()
+    },
   }
 }
 
@@ -110,8 +103,14 @@ mod tests {
     vec![0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5]
   }
 
-  pub fn build_vector_sorted() -> Vec<i32> {
+  /*
+  pub fn build_vector_sorted_inc() -> Vec<i32> {
     vec![0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5]
+  }
+  */
+
+  pub fn build_vector_sorted_dec() -> Vec<i32> {
+    vec![5, 5, 4, 4, 3, 3, 2, 2, 1, 1, 0, 0]
   }
 
   fn is_heap<F, T>(vec: &Vec<T>, compare: &F) -> bool
@@ -134,17 +133,17 @@ mod tests {
     let mut heap = Vec::new();
     let compare = &std::cmp::PartialOrd::ge;
     for el in data {
-      let len = heap.len();
-      insert_heap(el, &mut heap, compare, len);
+      insert_heap(el, &mut heap, compare);
+      println!("{:?}", heap);
     }
+    assert!(is_heap(&heap, compare));
     let mut output = Vec::new();
     while !heap.is_empty() {
-      let len = heap.len();
-      let val = extract_heap(&mut heap, compare, len);
+      let val = extract_heap(&mut heap, compare);
       println!("Popped: {}", val);
       output.push(val);
     }
-    let sorted: Vec<i32> = build_vector_sorted();
+    let sorted: Vec<i32> = build_vector_sorted_dec();
 
     assert_eq!(sorted.len(), output.len());
     assert_eq!(sorted, output);
